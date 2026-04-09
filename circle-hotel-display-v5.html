@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, initial-scale=1.0">
+  <title>Circle Hotel — Welcome (V5)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100;0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500;1,9..144,700;1,9..144,900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── V4: All readable text boosted for ~6ft TV viewing distance ──
+       Supporting copy: min 1.5rem → now 1.65–2rem+
+       Headlines preserved (already huge)
+    ─────────────────────────────────────────────────────────────── */
+
+    :root {
+      --ink:    #18293e;
+      --navy:   #1F3A5F;
+      --cream:  #EDE5D4;
+      --sand:   #E6D8C3;
+      --white:  #F7F7F5;
+      --gray:   #c8d0dc;
+      --blue:   #4a6fa5;
+      --sky:    #7ab4e0;
+      --sage:   #5d9470;
+      --amber:  #c9993a;
+      --coral:  #c96b4a;
+    }
+
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink); }
+
+    /* ── PERSISTENT CHROME ── */
+    .hotel-mark {
+      position: fixed; top: 3vh; left: 4vw; z-index: 50;
+      display: flex; align-items: center; gap: 0.8vw;
+    }
+    .mark-o {
+      width: 2.4vw; height: 2.4vw; min-width: 28px; min-height: 28px;
+      border-radius: 50%; border: 1.5px solid rgba(237,229,212,0.4);
+      position: relative;
+    }
+    .mark-o::after {
+      content: ''; position: absolute; inset: 28%;
+      border-radius: 50%; background: rgba(237,229,212,0.22);
+    }
+    .mark-name {
+      font-family: 'Syne', sans-serif; font-weight: 600;
+      font-size: clamp(0.85rem, 1vw, 1.1rem);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(237,229,212,0.4);
+    }
+
+    .slide-counter {
+      position: fixed; bottom: 3.5vh; right: 4vw; z-index: 50;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(0.8rem, 0.9vw, 1rem);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-track {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 4px; background: rgba(255,255,255,0.06); z-index: 100;
+    }
+    .progress-fill {
+      height: 100%; width: 0%; transition: width 0.1s linear;
+      background: linear-gradient(to right, var(--sky), var(--sage), var(--amber));
+    }
+
+    /* ── DOTS ── */
+    .dots {
+      position: fixed; bottom: 2vh; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 1vw; z-index: 100;
+    }
+    .dot {
+      width: clamp(7px, 0.65vw, 10px); height: clamp(7px, 0.65vw, 10px);
+      border-radius: 50%; cursor: pointer;
+      background: rgba(255,255,255,0.18);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .dot.active { background: var(--cream); transform: scale(1.5); }
+
+    /* ── SLIDE BASE ── */
+    .slide {
+      position: absolute; inset: 0;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.1s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes curtain {
+      from { clip-path: inset(0 0 100% 0); }
+      to   { clip-path: inset(0 0 0 0); }
+    }
+    @keyframes fromLeft {
+      from { opacity: 0; transform: translateX(-32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fromRight {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fromBelow {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.88) rotate(var(--r, 0deg)); }
+      to   { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); }
+    }
+    @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }
+
+    .slide.active .c  { animation: curtain  0.85s cubic-bezier(0.76,0,0.24,1) both; }
+    .slide.active .fl { animation: fromLeft  0.7s cubic-bezier(0.22,1,0.36,1) both; }
+    .slide.active .fr { animation: fromRight 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+    .slide.active .fb { animation: fromBelow 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+    .slide.active .pi { animation: popIn     0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .slide.active .fd { animation: fadeOnly  1.1s ease both; }
+
+    .d1 { animation-delay: 0.1s !important; }
+    .d2 { animation-delay: 0.28s !important; }
+    .d3 { animation-delay: 0.44s !important; }
+    .d4 { animation-delay: 0.58s !important; }
+    .d5 { animation-delay: 0.72s !important; }
+    .d6 { animation-delay: 0.86s !important; }
+    .d7 { animation-delay: 1.0s  !important; }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 1 — DIRECT BOOKING
+    ════════════════════════════════════════════════ */
+    .s1 { background: var(--ink); }
+
+    .s1-big {
+      position: absolute; top: 5vh; left: 5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(5rem, 13vw, 12rem);
+      line-height: 0.87; letter-spacing: -0.03em; color: var(--cream);
+      clip-path: inset(0 0 100% 0);
+    }
+    .s1-big em { font-style: italic; color: var(--sky); font-weight: 700; }
+
+    .s1-line {
+      position: absolute; top: 57vh; left: 5vw;
+      width: 0; height: 2px;
+      background: linear-gradient(to right, var(--sky), transparent);
+      transition: width 1.6s ease 0.9s;
+    }
+    .slide.active .s1-line { width: 42vw; }
+
+    /* Perk pills — V4: bigger for TV distance */
+    .perk {
+      position: absolute;
+      display: flex; align-items: center; gap: 1vw;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      padding: 1.8vh 2.6vw 1.8vh 2vw;
+      --r: 0deg;
+      transform: rotate(var(--r));
+    }
+    .perk-icon { font-size: clamp(1.9rem, 2.8vw, 2.7rem); line-height: 1; }
+    .perk-label {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(1.55rem, 2.5vw, 2.2rem);
+      color: var(--cream); line-height: 1.1;
+    }
+    .perk-sub {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+      color: var(--gray); line-height: 1.3; margin-top: 0.2vh;
+    }
+
+    .p1 { bottom: 31vh; left: 4vw;   --r: -2deg;   }
+    .p2 { bottom: 15vh; left: 12vw;  --r:  1.5deg; }
+    .p3 { bottom: 30vh; left: 30vw;  --r: -1deg;   }
+    .p4 { bottom: 14vh; left: 38vw;  --r:  2deg;   }
+    .p5 { bottom: 26vh; left: 62vw;  --r: -1.5deg; }
+
+    .s1-url {
+      position: absolute; bottom: 6vh; right: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.2vw, 1.25rem);
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(74,111,165,0.7);
+    }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 2 — GYM  (V4: EDGE logo badge)
+    ════════════════════════════════════════════════ */
+    .s2 { background: var(--ink); }
+
+    .s2-watermark {
+      position: absolute; right: -2vw; top: -5vh;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: 58vh; line-height: 1;
+      color: var(--sage); opacity: 0.04;
+      pointer-events: none; user-select: none;
+    }
+    .s2-connector {
+      position: absolute; right: 29vw; top: 20vh;
+      width: 1px; height: 55vh;
+      background: repeating-linear-gradient(
+        to bottom, rgba(93,148,112,0.35) 0, rgba(93,148,112,0.35) 5px,
+        transparent 5px, transparent 14px
+      );
+    }
+
+    .s2-kicker {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.25vw, 1.3rem);
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--sage);
+    }
+    .s2-edge {
+      position: absolute; top: 12vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 100;
+      font-size: clamp(5rem, 13vw, 12rem);
+      line-height: 0.85; letter-spacing: -0.04em;
+      color: rgba(237,229,212,0.14);
+    }
+    .s2-gym {
+      position: absolute; top: 36vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(5rem, 13vw, 12rem);
+      line-height: 0.85; letter-spacing: -0.04em; color: var(--cream);
+    }
+
+    /* EDGE badge — circular logo-style badge */
+    .s2-badge {
+      position: absolute; top: 9vh; right: 5vw;
+      width: clamp(130px, 15vw, 200px); height: clamp(130px, 15vw, 200px);
+      border-radius: 50%;
+      border: 2.5px solid rgba(93,148,112,0.5);
+      background: rgba(93,148,112,0.07);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.3vh;
+    }
+    .s2-badge-word {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(1.9rem, 3.8vw, 3.5rem);
+      letter-spacing: 0.1em; color: var(--sage);
+      line-height: 1;
+    }
+    .s2-badge-bar {
+      width: 42%; height: 1.5px;
+      background: rgba(93,148,112,0.45);
+      margin: 0.4vh 0;
+    }
+    .s2-badge-sub {
+      font-family: 'Syne', sans-serif; font-weight: 600;
+      font-size: clamp(0.6rem, 0.85vw, 0.85rem);
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: rgba(93,148,112,0.65);
+    }
+
+    /* Stats */
+    .s2-stat { position: absolute; }
+    .s2-stat-num {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(3.1rem, 6.2vw, 5.8rem);
+      line-height: 1; color: var(--sage);
+    }
+    .s2-stat-label {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.4rem, 1.85vw, 1.75rem);
+      color: var(--gray); line-height: 1.45; margin-top: 0.5vh;
+    }
+
+    .s2-s1 { top: 33vh; right: 10vw; text-align: right; }
+    .s2-s3 { top: 57vh; right: 20vw; }
+
+    .s2-note {
+      position: absolute; bottom: 8vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.4rem, 1.85vw, 1.75rem);
+      color: var(--gray); letter-spacing: 0.04em;
+    }
+    .s2-note strong { color: var(--cream); font-weight: 700; }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 3 — BEACH  (V4: Jennings + Penfield)
+    ════════════════════════════════════════════════ */
+    .s3 { background: var(--ink); }
+
+    .s3-kicker {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.25vw, 1.3rem);
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--sky);
+    }
+    .s3-big {
+      position: absolute; top: 8vh; left: 4vw;
+      font-family: 'Fraunces', serif; font-weight: 900; font-style: italic;
+      font-size: clamp(6.5rem, 19vw, 17rem);
+      line-height: 0.82; letter-spacing: -0.04em; color: var(--cream);
+      white-space: nowrap;
+    }
+    .s3-sub {
+      position: absolute; top: 43vh; right: 5vw;
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(1.3rem, 1.8vw, 1.65rem);
+      color: rgba(255,255,255,0.38); transform: rotate(-1.5deg);
+    }
+    .s3-wave {
+      position: absolute; top: 54vh; left: 0; right: 0;
+    }
+
+    /* Two beach cards side by side */
+    .s3-beaches {
+      position: absolute; top: 60vh; left: 5vw; right: 5vw;
+      display: flex; gap: 5vw; align-items: flex-start;
+    }
+    .s3-beach-card {
+      flex: 1;
+      border-left: 2.5px solid rgba(122,180,224,0.35);
+      padding-left: 2.2vw;
+    }
+    .s3-beach-name {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(2.1rem, 3.4vw, 3.2rem);
+      color: var(--cream); margin-bottom: 0.6vh; line-height: 1.05;
+    }
+    .s3-beach-dist {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1.2rem, 1.6vw, 1.55rem);
+      color: var(--sky); letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 0.7vh;
+    }
+    .s3-beach-body {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.25rem, 1.7vw, 1.65rem);
+      color: var(--gray); line-height: 1.6;
+    }
+
+    .s3-extras {
+      position: absolute; bottom: 6vh; right: 5vw; text-align: right;
+    }
+    .s3-extras-hed {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(0.9rem, 1.1vw, 1.1rem);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sand); margin-bottom: 1.2vh;
+    }
+    .s3-extras-item {
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+      font-size: clamp(1.4rem, 2vw, 1.9rem);
+      color: rgba(237,229,212,0.75); line-height: 1.75;
+    }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 4 — POOL  (CREAM background)
+    ════════════════════════════════════════════════ */
+    .s4 { background: var(--cream); }
+
+    .s4-bg-circle, .s4-bg-circle-2 {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      border-radius: 50%; border: 1px solid rgba(31,58,95,0.07);
+      pointer-events: none;
+    }
+    .s4-bg-circle   { width: 90vh; height: 90vh; }
+    .s4-bg-circle-2 { width: 65vh; height: 65vh; }
+
+    .s4-label {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.2vw, 1.25rem);
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(31,58,95,0.4);
+    }
+    .s4-rotated {
+      position: absolute; top: 50%; left: 2.5vw;
+      transform: translateY(-50%) rotate(-90deg);
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(0.8rem, 0.95vw, 1rem);
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(31,58,95,0.18); white-space: nowrap;
+    }
+    .s4-open {
+      position: absolute; top: 10vh; right: 5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(5rem, 12vw, 11rem);
+      line-height: 0.88; letter-spacing: -0.04em; color: var(--navy);
+      text-align: right;
+    }
+    .s4-open em { font-style: italic; color: var(--blue); }
+
+    .s4-time-block {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%); text-align: center;
+    }
+    .s4-time-from, .s4-time-to {
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(4.5rem, 11vw, 10rem);
+      line-height: 1; letter-spacing: -0.04em; color: var(--navy);
+    }
+    .s4-arrow {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(2rem, 3.5vw, 3.5rem); color: var(--blue); opacity: 0.7;
+    }
+
+    .s4-season {
+      position: absolute; bottom: 16vh; left: 5vw;
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+      font-size: clamp(1.65rem, 2.5vw, 2.35rem);
+      color: rgba(31,58,95,0.55); line-height: 1.45;
+    }
+    .s4-note {
+      position: absolute; bottom: 7.5vh; right: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.25rem, 1.65vw, 1.6rem);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(31,58,95,0.4); text-align: right; line-height: 1.8;
+    }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 5 — BREAKFAST
+    ════════════════════════════════════════════════ */
+    .s5 { background: var(--ink); }
+
+    .s5-kicker {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.25vw, 1.3rem);
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber);
+    }
+    .s5-good {
+      position: absolute; top: 11vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 100;
+      font-size: clamp(4.5rem, 11.5vw, 10.5rem);
+      line-height: 0.88; letter-spacing: -0.03em;
+      color: rgba(237,229,212,0.18);
+    }
+    .s5-morning {
+      position: absolute; top: 28vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 900; font-style: italic;
+      font-size: clamp(4.5rem, 11.5vw, 10.5rem);
+      line-height: 0.88; letter-spacing: -0.03em; color: var(--cream);
+    }
+    .s5-neighbor {
+      position: absolute; top: 57vh; left: 5vw;
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+      font-size: clamp(1.85rem, 3vw, 2.8rem); color: var(--amber);
+    }
+    .s5-tagline {
+      position: absolute; top: 67vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.3rem, 1.7vw, 1.65rem);
+      color: var(--gray); line-height: 1.75; max-width: 28vw;
+    }
+
+    .s5-divider {
+      position: absolute; top: 18vh; right: 34vw;
+      width: 1px; height: 62vh;
+      background: linear-gradient(to bottom, transparent, rgba(201,153,58,0.22), transparent);
+    }
+
+    .s5-times {
+      position: absolute; top: 22vh; right: 5vw;
+    }
+    .s5-time-row { margin-bottom: 4vh; }
+    .s5-time-day {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1.25rem, 1.7vw, 1.6rem);
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 0.4vh;
+    }
+    .s5-time-val {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(2.4rem, 5.2vw, 4.8rem);
+      line-height: 1; letter-spacing: -0.02em; color: var(--amber);
+    }
+
+    .s5-menu {
+      position: absolute; bottom: 10vh; right: 5vw;
+      display: flex; flex-direction: column; gap: 1.3vh; align-items: flex-end;
+    }
+    .s5-menu-row { display: flex; gap: 1.6vw; }
+    .s5-chip {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1.3rem, 1.7vw, 1.65rem);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(201,153,58,0.85);
+      border-bottom: 1px solid rgba(201,153,58,0.3);
+      padding-bottom: 0.3vh;
+    }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 6 — HOUSEKEEPING
+    ════════════════════════════════════════════════ */
+    .s6 { background: var(--ink); }
+
+    .s6-watermark {
+      position: absolute; right: -3vw; top: -10vh;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: 96vh; line-height: 1; letter-spacing: -0.05em;
+      color: var(--sage); opacity: 0.022;
+      pointer-events: none; user-select: none;
+    }
+    .s6-divider-v {
+      position: absolute; top: 16vh; right: 40vw;
+      width: 1px; height: 66vh;
+      background: linear-gradient(to bottom, transparent, rgba(93,148,112,0.22), transparent);
+    }
+    .s6-kicker {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.25vw, 1.3rem);
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--sage);
+    }
+    /* Main label — "Housekeeping" as the hero word */
+    .s6-label {
+      position: absolute; top: 10vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(3.5rem, 8.5vw, 8rem);
+      line-height: 0.88; letter-spacing: -0.04em; color: var(--cream);
+    }
+    /* Sub-fact — "Every 3 days." smaller beneath */
+    .s6-hed {
+      position: absolute; top: 33vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(2.2rem, 5.5vw, 5.2rem);
+      line-height: 0.9; letter-spacing: -0.04em;
+      color: rgba(237,229,212,0.5);
+    }
+    .s6-hed em { font-style: italic; color: var(--sage); font-weight: 700; }
+
+    .s6-sub {
+      position: absolute; top: 52vh; left: 5vw;
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(1.4rem, 2vw, 1.85rem);
+      color: rgba(237,229,212,0.45); max-width: 36vw; line-height: 1.55;
+    }
+
+    /* Day timeline — V4 new */
+    .s6-timeline {
+      position: absolute; top: 50vh; left: 5vw;
+      display: flex; align-items: stretch; gap: 0; width: 50vw;
+    }
+    .s6-day {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2.8vh 1.2vw 2.2vh;
+      border: 1px solid rgba(237,229,212,0.08);
+      border-right: none;
+      background: rgba(255,255,255,0.025);
+      position: relative;
+    }
+    .s6-day:first-child { border-radius: 1.2vw 0 0 1.2vw; }
+    .s6-day:last-child  { border-radius: 0 1.2vw 1.2vw 0; border-right: 1px solid rgba(237,229,212,0.08); }
+
+    /* Day 1 — check-in accent */
+    .s6-day.d-checkin {
+      border-color: rgba(237,229,212,0.18);
+      border-right: none;
+      background: rgba(237,229,212,0.04);
+    }
+    /* Day 2 — quiet / nothing */
+    .s6-day.d-quiet {
+      background: rgba(255,255,255,0.015);
+    }
+    /* Day 3 — housekeeping highlight */
+    .s6-day.d-service {
+      border-color: rgba(93,148,112,0.55);
+      border-right: 1px solid rgba(93,148,112,0.55);
+      background: rgba(93,148,112,0.1);
+    }
+
+    .s6-day-num {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(0.85rem, 1.05vw, 1.05rem);
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+      margin-bottom: 2vh;
+    }
+    .d-checkin .s6-day-num { color: rgba(237,229,212,0.5); }
+    .d-service .s6-day-num { color: var(--sage); }
+
+    .s6-day-icon {
+      font-size: clamp(2.3rem, 3.8vw, 3.5rem);
+      line-height: 1; margin-bottom: 1.8vh;
+      opacity: 0.22;
+    }
+    .d-checkin .s6-day-icon { opacity: 0.9; }
+    .d-service .s6-day-icon { opacity: 1; }
+
+    .s6-day-label {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(1.3rem, 2vw, 1.85rem);
+      color: rgba(237,229,212,0.2);
+      text-align: center; line-height: 1.2;
+    }
+    .d-checkin .s6-day-label { color: rgba(237,229,212,0.65); }
+    .d-service .s6-day-label { color: var(--sage); }
+
+    .s6-day-sub {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(0.95rem, 1.25vw, 1.2rem);
+      color: rgba(255,255,255,0.18);
+      text-align: center; margin-top: 0.5vh; line-height: 1.4;
+    }
+    .d-checkin .s6-day-sub { color: rgba(237,229,212,0.35); }
+    .d-service .s6-day-sub { color: rgba(93,148,112,0.7); }
+
+    /* Connector arrows between cards */
+    .s6-day-arrow {
+      align-self: center;
+      font-family: 'Syne', sans-serif; font-weight: 300;
+      font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+      color: rgba(255,255,255,0.12);
+      flex-shrink: 0; padding: 0 0.3vw;
+      position: relative; z-index: 1;
+    }
+
+    .s6-points {
+      position: absolute; top: 13vh; right: 5vw;
+      display: flex; flex-direction: column; gap: 4.5vh;
+      max-width: 37vw;
+    }
+    .s6-point-hed {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(1.75rem, 2.7vw, 2.5rem);
+      color: var(--cream); margin-bottom: 0.6vh; line-height: 1.1;
+    }
+    .s6-point-body {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.25rem, 1.65vw, 1.6rem);
+      color: var(--gray); line-height: 1.65;
+    }
+
+    .s6-sign {
+      position: absolute; bottom: 6vh; left: 5vw;
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(1rem, 1.3vw, 1.25rem);
+      color: rgba(255,255,255,0.2);
+    }
+
+
+    /* ════════════════════════════════════════════════
+       SLIDE 7 — RESTAURANTS  (new in V4)
+       Coral warmth. Ask the front desk.
+    ════════════════════════════════════════════════ */
+    .s7 { background: var(--ink); }
+
+    .s7-glow {
+      position: absolute; bottom: -20vh; right: -10vw;
+      width: 70vw; height: 70vw; border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(201,107,74,0.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .s7-kicker {
+      position: absolute; top: 7vh; left: 5vw;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(1rem, 1.25vw, 1.3rem);
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--coral);
+    }
+
+    .s7-hed {
+      position: absolute; top: 10vh; left: 4.5vw;
+      font-family: 'Fraunces', serif; font-weight: 900;
+      font-size: clamp(3.2rem, 8.2vw, 7.8rem);
+      line-height: 0.9; letter-spacing: -0.04em; color: var(--cream);
+    }
+    .s7-hed em { font-style: italic; color: var(--coral); font-weight: 700; }
+
+    /* Big CTA */
+    .s7-cta {
+      position: absolute; top: 62vh; left: 5vw;
+      display: flex; align-items: flex-start; gap: 2.2vw;
+    }
+    .s7-cta-icon {
+      font-size: clamp(2.8rem, 4.6vw, 4.4rem); line-height: 1;
+      flex-shrink: 0; padding-top: 0.3vh;
+    }
+    .s7-cta-main {
+      font-family: 'Fraunces', serif; font-weight: 700; font-style: italic;
+      font-size: clamp(2.1rem, 3.5vw, 3.3rem);
+      color: var(--cream); line-height: 1.15;
+    }
+    .s7-cta-sub {
+      font-family: 'Syne', sans-serif; font-weight: 500;
+      font-size: clamp(1.25rem, 1.65vw, 1.6rem);
+      color: var(--gray); margin-top: 0.8vh; line-height: 1.55;
+      max-width: 46vw;
+    }
+
+    /* Divider */
+    .s7-divider {
+      position: absolute; top: 12vh; right: 42vw;
+      width: 1px; height: 80vh;
+      background: linear-gradient(to bottom, transparent, rgba(201,107,74,0.2), transparent);
+    }
+
+    /* Restaurant list — 2×5 grid (V5) */
+    .s7-rlist {
+      position: absolute; top: 12vh; right: 3vw;
+      width: 50vw;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      row-gap: 3.6vh;
+      column-gap: 3vw;
+    }
+    .s7-ritem {
+      display: flex; align-items: baseline; gap: 1vw;
+    }
+    .s7-rnum {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: clamp(0.7rem, 0.85vw, 0.9rem);
+      color: rgba(201,107,74,0.45); letter-spacing: 0.06em;
+      flex-shrink: 0; line-height: 1; padding-bottom: 0.15em;
+    }
+    .s7-rname {
+      font-family: 'Fraunces', serif; font-weight: 700;
+      font-size: clamp(1.65rem, 2.6vw, 2.4rem);
+      color: var(--cream); line-height: 1.1;
+    }
+    /* Subtle hover / active glow on each name */
+    .s7-ritem:nth-child(odd)  .s7-rname { color: var(--cream); }
+    .s7-ritem:nth-child(even) .s7-rname { color: rgba(237,229,212,0.85); }
+  </style>
+</head>
+<body>
+
+<!-- Grain texture -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;">
+  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#g)" opacity="0.025"/>
+  </svg>
+</div>
+
+<div class="hotel-mark">
+  <div class="mark-o"></div>
+  <span class="mark-name">Circle Hotel &nbsp;·&nbsp; Fairfield</span>
+</div>
+<div class="slide-counter" id="counter">1 / 7</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S1 — BOOK DIRECT
+══════════════════════════════════════════════ -->
+<div class="slide s1 active" id="slide-0">
+  <div class="s1-big c d1">Book<br>Di<em>rect.</em></div>
+  <div class="s1-line"></div>
+
+  <div class="perk p1 pi d3">
+    <div class="perk-icon">🕐</div>
+    <div>
+      <div class="perk-label">Early Check-In</div>
+      <div class="perk-sub">In as soon as it's ready</div>
+    </div>
+  </div>
+  <div class="perk p2 pi d4">
+    <div class="perk-icon">🌙</div>
+    <div>
+      <div class="perk-label">Late Check-Out</div>
+      <div class="perk-sub">Take your time — when available</div>
+    </div>
+  </div>
+  <div class="perk p3 pi d5">
+    <div class="perk-icon">⭐</div>
+    <div>
+      <div class="perk-label">Room Upgrade</div>
+      <div class="perk-sub">Best available room, on us</div>
+    </div>
+  </div>
+  <div class="perk p4 pi d6">
+    <div class="perk-icon">🚲</div>
+    <div>
+      <div class="perk-label">Free Bike Rental</div>
+      <div class="perk-sub">Direct guests only</div>
+    </div>
+  </div>
+  <div class="perk p5 pi d7">
+    <div class="perk-icon">🍽️</div>
+    <div>
+      <div class="perk-label">Local Restaurant Discounts</div>
+      <div class="perk-sub">Special rates at nearby spots</div>
+    </div>
+  </div>
+
+  <div class="s1-url fd d7">circlehotelfairfield.com</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S2 — GYM  (V4: EDGE badge)
+══════════════════════════════════════════════ -->
+<div class="slide s2" id="slide-1">
+  <div class="s2-connector fd d2"></div>
+  <div class="s2-kicker fd d1">Complimentary · All Guests</div>
+  <div class="s2-edge c d2">EDGE</div>
+  <div class="s2-gym c d1">GYM.</div>
+
+  <!-- EDGE logo badge -->
+  <div class="s2-badge pi d3">
+    <div class="s2-badge-word">EDGE</div>
+    <div class="s2-badge-bar"></div>
+    <div class="s2-badge-sub">Fitness Club</div>
+  </div>
+
+  <div class="s2-stat s2-s1 fr d4">
+    <div class="s2-stat-num">Free.</div>
+    <div class="s2-stat-label">Full access for every guest</div>
+  </div>
+  <div class="s2-stat s2-s3 fr d5">
+    <div class="s2-stat-num">5 min away</div>
+    <div class="s2-stat-label">Quick drive or an easy walk</div>
+  </div>
+
+  <div class="s2-note fb d6">
+    <strong>Ask at the front desk</strong> for passes and more details.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S3 — BEACH  (V4: Jennings + Penfield)
+══════════════════════════════════════════════ -->
+<div class="slide s3" id="slide-2">
+  <div class="s3-kicker fd d1">Fairfield's Best Beaches</div>
+  <div class="s3-big c d1">Beach.</div>
+  <div class="s3-sub fd d2">complimentary beach passes for every guest</div>
+
+  <div class="s3-wave fd d3">
+    <svg viewBox="0 0 1920 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" height="40" width="100%">
+      <path d="M0,20 C240,40 480,0 720,20 C960,40 1200,0 1440,20 C1680,40 1820,10 1920,20"
+            fill="none" stroke="rgba(122,180,224,0.2)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Two beach cards -->
+  <div class="s3-beaches fb d4">
+    <div class="s3-beach-card">
+      <div class="s3-beach-name">Jennings Beach</div>
+      <div class="s3-beach-dist">~1 mile · 5 min away</div>
+      <div class="s3-beach-body">
+        Long sandy stretch with lifeguards,<br>
+        picnic areas &amp; gentle waves.
+      </div>
+    </div>
+    <div class="s3-beach-card">
+      <div class="s3-beach-name">Penfield Beach</div>
+      <div class="s3-beach-dist">~1 mile · 5 min away</div>
+      <div class="s3-beach-body">
+        Quieter spot with beautiful views<br>
+        and classic CT shoreline charm.
+      </div>
+    </div>
+  </div>
+
+  <div class="s3-extras fd d5">
+    <div class="s3-extras-hed">Upgrade your beach day</div>
+    <div class="s3-extras-item">+ Chairs &amp; umbrella</div>
+    <div class="s3-extras-item">+ Fresh towels</div>
+    <div class="s3-extras-item">+ Snacks &amp; cold drinks</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S4 — POOL  (light bg)
+══════════════════════════════════════════════ -->
+<div class="slide s4" id="slide-3">
+  <div class="s4-bg-circle fd d1"></div>
+  <div class="s4-bg-circle-2 fd d1"></div>
+  <div class="s4-rotated fd d1">Outdoor Pool · Seasonal</div>
+  <div class="s4-label fd d1">Pool hours</div>
+  <div class="s4-open c d2">Pool's<br><em>open.</em></div>
+
+  <div class="s4-time-block">
+    <div class="s4-time-from c d2">8 AM</div>
+    <div class="s4-arrow fd d3">↓</div>
+    <div class="s4-time-to c d3">8 PM</div>
+  </div>
+
+  <div class="s4-season fl d4">
+    Memorial Day<br>through Labor Day<br>
+    <span style="font-size:0.78em; opacity:0.6;">(weather permitting — this is CT)</span>
+  </div>
+  <div class="s4-note fd d5">
+    Towels at the front desk<br>Complimentary for all guests
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S5 — BREAKFAST
+══════════════════════════════════════════════ -->
+<div class="slide s5" id="slide-4">
+  <div class="s5-kicker fd d1">Free breakfast · Every morning · Served in the Lobby</div>
+  <div class="s5-good c d2">Free</div>
+  <div class="s5-morning c d1">breakfast.</div>
+  <div class="s5-neighbor fb d3">every morning.</div>
+  <div class="s5-tagline fd d4">
+    100% complimentary — included<br>with every stay, no catch.<br>Served fresh in the lobby daily.
+  </div>
+
+  <div class="s5-divider fd d2"></div>
+
+  <div class="s5-times">
+    <div class="s5-time-row fr d3">
+      <div class="s5-time-day">Mon – Thu</div>
+      <div class="s5-time-val">6:30–9:30 AM</div>
+    </div>
+    <div class="s5-time-row fr d4">
+      <div class="s5-time-day">Fri – Sun</div>
+      <div class="s5-time-val">7–10 AM</div>
+    </div>
+  </div>
+
+  <div class="s5-menu fb d5">
+    <div class="s5-menu-row">
+      <span class="s5-chip">Coffee</span>
+      <span class="s5-chip">Hot Waffles</span>
+      <span class="s5-chip">Pastries</span>
+    </div>
+    <div class="s5-menu-row">
+      <span class="s5-chip">Bagels</span>
+      <span class="s5-chip">Fresh Fruit</span>
+      <span class="s5-chip">Yogurt</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S6 — HOUSEKEEPING
+══════════════════════════════════════════════ -->
+<div class="slide s6" id="slide-5">
+  <div class="s6-watermark fd d1">3</div>
+  <div class="s6-divider-v fd d2"></div>
+  <div class="s6-kicker fd d1">Your Room · What to Expect</div>
+  <div class="s6-label c d1">House-<br>keeping.</div>
+  <div class="s6-hed fb d2">Every <em>3</em> days.</div>
+
+  <!-- Day timeline (V4 new) -->
+  <div class="s6-timeline fb d3">
+    <div class="s6-day d-checkin">
+      <div class="s6-day-num">Day 1</div>
+      <div class="s6-day-icon">🛎️</div>
+      <div class="s6-day-label">Check In</div>
+      <div class="s6-day-sub">Arrive &amp; settle in</div>
+    </div>
+    <div class="s6-day d-quiet">
+      <div class="s6-day-num">Day 2</div>
+      <div class="s6-day-icon">🌙</div>
+      <div class="s6-day-label">Rest</div>
+      <div class="s6-day-sub">Your space, undisturbed</div>
+    </div>
+    <div class="s6-day d-service">
+      <div class="s6-day-num">Day 3</div>
+      <div class="s6-day-icon">✨</div>
+      <div class="s6-day-label">Full Refresh</div>
+      <div class="s6-day-sub">Towels · linens · full clean</div>
+    </div>
+  </div>
+
+  <div class="s6-points">
+    <div class="fr d3">
+      <div class="s6-point-hed">🧺 &nbsp;Need towels sooner?</div>
+      <div class="s6-point-body">Extra towels, linens, or toiletries — anytime.<br>Call, text, or stop by the desk.</div>
+    </div>
+    <div class="fr d4">
+      <div class="s6-point-hed">🌿 &nbsp;It's a green thing</div>
+      <div class="s6-point-body">Fewer daily cleans = less water + energy.<br>Small choices that add up.</div>
+    </div>
+    <div class="fr d5">
+      <div class="s6-point-hed">📞 &nbsp;We're here 24/7</div>
+      <div class="s6-point-body">Call, text, or walk up to the desk anytime.<br>Whatever you need — seriously.</div>
+    </div>
+  </div>
+
+  <div class="s6-sign fd d7">— we mean it.</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     S7 — RESTAURANTS  (V5: named list)
+══════════════════════════════════════════════ -->
+<div class="slide s7" id="slide-6">
+  <div class="s7-glow fd d1"></div>
+  <div class="s7-divider fd d1"></div>
+
+  <div class="s7-kicker fd d1">Fairfield · Our Favorites</div>
+
+  <div class="s7-hed c d1">
+    Great local<br><em>restaurants</em><br>nearby.
+  </div>
+
+  <div class="s7-cta fb d4">
+    <div class="s7-cta-icon">🗣️</div>
+    <div>
+      <div class="s7-cta-main">Ask us for our top pick.</div>
+      <div class="s7-cta-sub">We're happy to make a recommendation<br>for any night out.</div>
+    </div>
+  </div>
+
+  <!-- Named restaurant list — 2 columns × 5 -->
+  <div class="s7-rlist">
+    <div class="s7-ritem fr d2"><span class="s7-rnum">01</span><span class="s7-rname">Ryebird</span></div>
+    <div class="s7-ritem fr d2"><span class="s7-rnum">06</span><span class="s7-rname">The Sinclair</span></div>
+
+    <div class="s7-ritem fr d3"><span class="s7-rnum">02</span><span class="s7-rname">Il Pelicano</span></div>
+    <div class="s7-ritem fr d3"><span class="s7-rnum">07</span><span class="s7-rname">Romanacci of Fairfield</span></div>
+
+    <div class="s7-ritem fr d4"><span class="s7-rnum">03</span><span class="s7-rname">Esh</span></div>
+    <div class="s7-ritem fr d4"><span class="s7-rnum">08</span><span class="s7-rname">Archie Moore's</span></div>
+
+    <div class="s7-ritem fr d5"><span class="s7-rnum">04</span><span class="s7-rname">Malibu</span></div>
+    <div class="s7-ritem fr d5"><span class="s7-rnum">09</span><span class="s7-rname">Colony Grill</span></div>
+
+    <div class="s7-ritem fr d6"><span class="s7-rnum">05</span><span class="s7-rname">Sophie's</span></div>
+    <div class="s7-ritem fr d6"><span class="s7-rnum">10</span><span class="s7-rname">Sally's Apizza</span></div>
+  </div>
+</div>
+
+
+<!-- PROGRESS + DOTS -->
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+<div class="dots" id="dotsContainer"></div>
+
+
+<script>
+  const SLIDE_COUNT = 7;
+  const SLIDE_DURATION = 10000;
+  const slides = document.querySelectorAll('.slide');
+  const fill   = document.getElementById('progressFill');
+  const dotsEl = document.getElementById('dotsContainer');
+  const ctr    = document.getElementById('counter');
+  let current  = 0, startTime = null;
+
+  for (let i = 0; i < SLIDE_COUNT; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  }
+  function allDots() { return dotsEl.querySelectorAll('.dot'); }
+
+  function goTo(i) {
+    slides[current].classList.remove('active');
+    allDots()[current].classList.remove('active');
+    current = i;
+    void slides[current].offsetWidth;
+    slides[current].classList.add('active');
+    allDots()[current].classList.add('active');
+    ctr.textContent = (current + 1) + ' / ' + SLIDE_COUNT;
+    startTime = null;
+  }
+
+  function tick(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    fill.style.width = Math.min(elapsed / SLIDE_DURATION * 100, 100) + '%';
+    if (elapsed >= SLIDE_DURATION) { goTo((current + 1) % SLIDE_COUNT); startTime = ts; }
+    requestAnimationFrame(tick);
+  }
+
+  void slides[0].offsetWidth;
+  requestAnimationFrame(tick);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo((current + 1) % SLIDE_COUNT);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo((current - 1 + SLIDE_COUNT) % SLIDE_COUNT);
+  });
+</script>
+</body>
+</html>
